@@ -10,14 +10,15 @@ import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from torch.distributions import Bernoulli
 from tqdm import trange
+from torch.nn import MultiheadAttention
 
+import flash_attn
 try:
-    from flash_attn.flash_attention import FlashMHA
-
+    from FlashMHA import FlashMHA
+    #from flash_attn.flash_attention import FlashMHA
     flash_attn_available = True
 except ImportError:
     import warnings
-
     warnings.warn("flash_attn is not installed")
     flash_attn_available = False
 
@@ -114,10 +115,12 @@ class TransformerModel(nn.Module):
 
         if use_fast_transformer:
             if fast_transformer_backend == "linear":
+                print("linear")
                 self.transformer_encoder = FastTransformerEncoderWrapper(
                     d_model, nhead, d_hid, nlayers, dropout
                 )
             elif fast_transformer_backend == "flash":
+                print("flash")
                 encoder_layers = FlashTransformerEncoderLayer(
                     d_model,
                     nhead,
@@ -128,6 +131,7 @@ class TransformerModel(nn.Module):
                 )
                 self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
         else:
+            print("encoder")
             encoder_layers = TransformerEncoderLayer(
                 d_model, nhead, d_hid, dropout, batch_first=True
             )
@@ -634,11 +638,11 @@ class FlashTransformerEncoderLayer(nn.Module):
     ) -> None:
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
-        self.self_attn = FlashMHA(
+        self.self_attn = MultiheadAttention(
             embed_dim=d_model,
             num_heads=nhead,
             batch_first=batch_first,
-            attention_dropout=dropout,
+            dropout=dropout,
             **factory_kwargs,
         )
         # Version compatibility workaround
@@ -700,17 +704,22 @@ class FlashTransformerEncoderLayer(nn.Module):
             if src_key_padding_mask.dtype != torch.bool:
                 src_key_padding_mask = src_key_padding_mask.bool()
             # NOTE: the FlashMHA uses mask 0 for padding tokens, which is the opposite
-            src_key_padding_mask_ = ~src_key_padding_mask
+            #src_key_padding_mask_ = ~src_key_padding_mask
+            src_key_padding_mask_ = src_key_padding_mask
 
         if self.norm_scheme == "pre":
             src = self.norm1(src)
-            src2 = self.self_attn(src, key_padding_mask=src_key_padding_mask_)[0]
+            src2, _ = self.self_attn(src, src, src, key_padding_mask=src_key_padding_mask_)
+            #src2 = self.self_attn(src, src_mask, src_key_padding_mask_)[0]
+            #src2 = self.self_attn(src, key_padding_mask=src_key_padding_mask_)[0]
             src = src + self.dropout1(src2)
             src = self.norm2(src)
             src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
             src = src + self.dropout2(src2)
         else:
-            src2 = self.self_attn(src, key_padding_mask=src_key_padding_mask_)[0]
+            #src2 = self.self_attn(src, src_mask, src_key_padding_mask_)[0]
+            #src2 = self.self_attn(src, key_padding_mask=src_key_padding_mask_)[0]
+            src2, _ = self.self_attn(src, src, src, key_padding_mask=src_key_padding_mask_)
             src = src + self.dropout1(src2)
             src = self.norm1(src)
             src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))

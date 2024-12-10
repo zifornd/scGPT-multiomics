@@ -9,6 +9,7 @@ import torch
 from anndata import AnnData
 from torch.utils.data import DataLoader, SequentialSampler
 from tqdm import tqdm
+from scipy.sparse import csr_matrix
 
 from .. import logger
 from ..data_collator import DataCollator
@@ -49,9 +50,10 @@ def get_batch_cell_embeddings(
     """
 
     count_matrix = adata.X
-    count_matrix = (
-        count_matrix if isinstance(count_matrix, np.ndarray) else count_matrix.A
-    )
+    if hasattr(count_matrix, 'toarray'):
+        count_matrix = count_matrix.toarray()
+
+
 
     # gene vocabulary ids
     if gene_ids is None:
@@ -255,7 +257,7 @@ def embed_data(
         fast_transformer_backend="flash",
         pre_norm=False,
     )
-    load_pretrained(model, torch.load(model_file, map_location=device), verbose=False)
+    load_pretrained(model, torch.load(model_file), verbose=False)
     model.to(device)
     model.eval()
 
