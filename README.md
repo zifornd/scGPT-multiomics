@@ -1,6 +1,6 @@
 # scGPT
 
-This is the official codebase for **scGPT: Towards Building a Foundation Model for Single-Cell Multi-omics Using Generative AI**.
+This is the modified codebase for **scGPT: Towards Building a Foundation Model for Single-Cell Multi-omics Using Generative AI**.
 
 [![Preprint](https://img.shields.io/badge/preprint-available-brightgreen)](https://www.biorxiv.org/content/10.1101/2023.04.30.538439) &nbsp;
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://scgpt.readthedocs.io/en/latest/) &nbsp;
@@ -27,7 +27,7 @@ scGPT is now available at the following online apps as well, so you can get star
 
 ## Installation
 
-scGPT works with Python >= 3.7.13 and R >=3.6.1. Please make sure you have the correct version of Python and R installed pre-installation.
+scGPT works with Python >= 3.10 and R >=3.6.1. Please make sure you have the correct version of Python and R installed pre-installation.
 
 scGPT is available on PyPI. To install scGPT, run the following command:
 
@@ -37,7 +37,7 @@ pip install scgpt "flash-attn<1.0.5"  # optional, recommended
 # pip install scgpt "flash-attn<1.0.5" "orbax<0.1.8"
 ```
 
-[Optional] We recommend using [wandb](https://wandb.ai/) for logging and visualization.
+[Optional] [wandb](https://wandb.ai/) for logging and visualization.
 
 ```bash
 pip install wandb
