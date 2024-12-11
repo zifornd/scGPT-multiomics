@@ -50,6 +50,8 @@ $ git clone this-repo-url
 $ cd scGPT
 $ poetry install
 ```
+[Optional] For the environment creation for running the Multiomics notebooks (/scGPT/tutorials/Tutorial_Integration.ipynb) , we are using the "scGPT_2.yml"  
+
 
 **Note**: The `flash-attn` dependency usually requires specific GPU and CUDA version. If you encounter any issues, please refer to the [flash-attn](https://github.com/HazyResearch/flash-attention/tree/main) repository for installation instructions. For now, May 2023, we recommend using CUDA 11.7 and flash-attn<1.0.5 due to various issues reported about installing new versions of flash-attn.
 
