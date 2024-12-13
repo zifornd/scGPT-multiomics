@@ -13,14 +13,14 @@ from tqdm import trange
 
 from torch.nn import MultiheadAttention
 
-import flash_attn
-try:
-    from FlashMHA import FlashMHA
-    #from flash_attn.flash_attention import FlashMHA
-except ImportError:
-    import warnings
+# import flash_attn
+# try:
+#     from FlashMHA import FlashMHA
+#     #from flash_attn.flash_attention import FlashMHA
+# except ImportError:
+#     import warnings
 
-    warnings.warn("flash_attn is not installed")
+#     warnings.warn("flash_attn is not installed")
 
 from .dsbn import DomainSpecificBatchNorm1d
 from .grad_reverse import grad_reverse
