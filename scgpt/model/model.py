@@ -12,15 +12,15 @@ from torch.distributions import Bernoulli
 from tqdm import trange
 from torch.nn import MultiheadAttention
 
-import flash_attn
-try:
-    from FlashMHA import FlashMHA
-    #from flash_attn.flash_attention import FlashMHA
-    flash_attn_available = True
-except ImportError:
-    import warnings
-    warnings.warn("flash_attn is not installed")
-    flash_attn_available = False
+# import flash_attn
+# try:
+#     from FlashMHA import FlashMHA
+#     #from flash_attn.flash_attention import FlashMHA
+#     flash_attn_available = True
+# except ImportError:
+#     import warnings
+#     warnings.warn("flash_attn is not installed")
+#     flash_attn_available = False
 
 from .dsbn import DomainSpecificBatchNorm1d
 from .grad_reverse import grad_reverse
