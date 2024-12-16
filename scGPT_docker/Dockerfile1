@@ -1,0 +1,63 @@
+# Use the official Python image from the Docker Hub
+FROM nvidia/cuda:12.1.0-devel-ubuntu20.04
+#FROM python:3.9-slim
+#FROM pytorch/pytorch:2.1.2-cuda11.8-cudnn8-devel
+# Set the working directory in the container
+WORKDIR /app
+
+# Set the DEBIAN_FRONTEND to noninteractive to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies and CUDA
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    gnupg2 \
+    curl \
+    ca-certificates \
+    python3.9 \
+    python3.9-dev \
+    python3-pip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python 3.9 as the default python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+
+
+# Add NVIDIA package repositories
+#RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin \
+#    && mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600 \
+#    && wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-ubuntu2004-11-8-local_11.8.0-1_amd64.deb \
+#    && dpkg -i cuda-repo-ubuntu2004-11-8-local_11.8.0-1_amd64.deb \
+#    && apt-key add /var/cuda-repo-ubuntu2004-11-8-local/7fa2af80.pub \
+#    && apt-get update \
+#    && apt-get -y install cuda
+
+# Set environment variables for CUDA
+#ENV PATH=/usr/local/cuda/bin:${PATH}
+#ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+ 
+# Copy the requirements file into the container
+COPY requirements.txt .
+
+# Install packaging first
+RUN pip install --no-cache-dir packaging torch numpy
+
+# Install git and other necessary system dependencies
+#RUN apt-get update && apt-get install -y git && \
+#    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Verify git installation
+RUN git --version
+
+# Set the CUDA_HOME environment variable
+#ENV CUDA_HOME=/usr/local/cuda
+
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of your application code into the container
+COPY . .
+
+# Command to run your application
+CMD ["python", "your_main_script.py"]
