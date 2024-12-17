@@ -32,15 +32,9 @@ scGPT works with Python >= 3.10 and R >=3.6.1. Please make sure you have the cor
 scGPT is available on PyPI. To install scGPT, run the following command:
 
 ```bash
-pip install scgpt "flash-attn<1.0.5"  # optional, recommended
+pip install scgpt   # optional, recommended
 # As of 2023.09, pip install may not run with new versions of the google orbax package, if you encounter related issues, please use the following command instead:
 # pip install scgpt "flash-attn<1.0.5" "orbax<0.1.8"
-```
-
-[Optional] [wandb](https://wandb.ai/) for logging and visualization.
-
-```bash
-pip install wandb
 ```
 
 For developing, we are using the [Poetry](https://python-poetry.org/) package manager. To install Poetry, follow the instructions [here](https://python-poetry.org/docs/#installation).
@@ -70,9 +64,35 @@ Here is the list of pretrained models. Please find the links for downloading the
 | kidney                    | Pretrained on 814 thousand kidney cells                 | [link](https://drive.google.com/drive/folders/1S-1AR65DF120kNFpEbWCvRHPhpkGK3kK?usp=sharing) |
 | pan-cancer                | Pretrained on 5.7 million cells of various cancer types | [link](https://drive.google.com/drive/folders/13QzLHilYUd0v3HTwa_9n4G4yEF-hdkqa?usp=sharing) |
 
-## Fine-tune scGPT for scRNA-seq integration
 
-Please see our example code in [examples/finetune_integration.py](examples/finetune_integration.py). By default, the script assumes the scGPT checkpoint folder stored in the `examples/save` directory.
+## Running the Notebooks on the Docker image
+
+Build the Docker image:
+```bash
+docker build -t scgpt_docker .
+```
+Run the Docker container:
+```bash
+docker run -it scgpt_docker
+```
+
+For Multiomics-scGPT:
+```bash
+docker run --gpus 0 -it -v /home/ssh-user/data/flu_vacc_CITEseq_combinedassay.h5ad:/app/repo/data/flu_vacc_CITEseq_combinedassay.h5ad -v /home/ssh-user/save:/app/repo/save -v /home/ssh-user/metrics_collection/Complete_multiomics_script.py:/app/repo/MultiomicsInt_backup_python.py scgpt_docker
+```
+For MEFISTO:
+```bash
+docker run --gpus 0 -it -v /home/ssh-user/data/Spatial_CITE_Seq/:/app/repo/data/Spatial_CITE_Seq/ -v /home/ssh-user/Notebooks_to_Py/MEFISTO_Integration_GEX.py:/app/repo/MEFISTO_Integration_GEX.py -v /home/ssh-user/save/:/app/repo/models/ scgpt_docker
+``` 
+For MOFA:
+```bash
+docker run --gpus 0 -it -v /home/ssh-user/data/flu_vacc_CITEseq_combinedassay.h5ad:/app/repo/data/flu_vacc_CITEseq_combinedassay.h5ad -v /home/ssh-user/Notebooks_to_Py/MOFA_Integration.py:/app/repo/MOFA_Integration.py -v /home/ssh-user/save/:/app/repo/models/ scgpt_docker
+```
+
+NOTE: for building the docker image to run scGPT for multiomics, recommended to run on a server with GPU and have atleast 40+ GB free
+
+Please see our example code in [Notebooks_to_py/Complete_multiomics_script.py]. By default, the script assumes the scGPT checkpoint folder stored in the `examples/save` directory.
+
 
 ## To-do-list
 
